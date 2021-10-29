@@ -158,6 +158,16 @@ void BFS(int n, bool* Arr2, int i, int** Arr)
 	}
 }
 
+void Free(int** Arr, bool* Arr2, int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		free(Arr[i]);
+	}
+	free(Arr);
+	free(Arr2);
+}
+
 //void POSCH(int n, int** Arr)
 //{
 //	bool* Arr2;
@@ -207,4 +217,6 @@ int main()
 	printf("\ntime in ms: %f", result);
 
 	_getch();
+
+	Free(t, Arr2, n);
 }
