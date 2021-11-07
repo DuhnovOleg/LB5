@@ -22,6 +22,75 @@ typedef struct Queue
 	List* Back;
 }Queue;
 
+typedef struct Node
+{
+	int vertex;
+	Node* Next;
+};
+
+typedef struct Graf
+{
+	int number;
+	Node** Array;
+};
+
+Node* Initialization(int vert)
+{
+	Node* node = (Node*)malloc(sizeof(Node));
+	node->vertex = vert;
+	node->Next = NULL;
+	return node;
+}
+
+Graf* Initialization_Graf(int n)
+{
+	Graf* graf = (Graf*)malloc(sizeof(Graf));
+	graf->number = n;
+	graf->Array = (Node**)malloc(n * sizeof(Node*));
+	for (int i = 0; i < n; i++)
+		graf->Array[i] = NULL;
+	return graf;
+}
+
+void add_spisok(int i, int j, Graf* graf)
+{
+	Node* NewNode = Initialization(j);
+	if (graf->Array[i] == NULL)
+	{
+		graf->Array[i] = NewNode;
+		NewNode = NULL;
+	}
+	Node* temp = graf->Array[i];
+	while (temp->Next != NULL)
+		temp = temp->Next;
+	temp->Next = NewNode;
+	NewNode = Initialization(i);
+	if (graf->Array[j] == NULL)
+	{
+		graf->Array[j] = NewNode;
+		NewNode = NULL;
+	}
+	temp = graf->Array[j];
+	while (temp->Next != NULL)
+		temp = temp->Next;
+	temp->Next = NewNode;
+}
+
+void print(Graf* graf)
+{
+	for (int i = 0; i < graf->number; i++)
+	{
+		Node* temp = graf->Array[i];
+		printf("%d - ая вершина: ", i + 1);
+		while (temp)
+		{
+			printf("%d ", temp->vertex + 1);
+			temp = temp->Next;
+		}
+		printf("\n");
+	}
+}
+
 void init(Queue* Que)
 {
 	Que->Front = new List;
@@ -158,6 +227,30 @@ void BFS(int n, bool* Arr2, int i, int** Arr)
 	}
 }
 
+void BFS_SPISOK(Graf* graf, int n, bool* Arr2, int i)
+{
+	queue<int> que;
+	que.push(i);
+	Arr2[i] = true;
+	
+	while (!que.empty())
+	{
+		i = que.front();
+		que.pop();
+		printf("%d ", i + 1);
+		Node* temp = graf->Array[i];
+		while (temp)
+		{
+			if (Arr2[temp->vertex] == false)
+			{
+				que.push(temp->vertex);
+				Arr2[temp->vertex] = true;
+			}
+			temp = temp->Next;
+		}
+	}
+}
+
 void Free(int** Arr, bool* Arr2, int n)
 {
 	for (int i = 0; i < n; i++)
@@ -216,6 +309,21 @@ int main()
 	float result = end - st;
 	printf("\ntime in ms: %f", result);
 
+	Graf* graf = Initialization_Graf(n);
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (t[i][j] == 1 && i > j)
+				add_spisok(i, j, graf);
+		}
+	}
+	printf("\n");
+	print(graf);
+	for (int i = 0; i < n; i++)
+		Arr2[i] = false;
+	printf("Result obgod v schir spisok smegnosti: ");
+	BFS_SPISOK(graf, n, Arr2, 0);
 	_getch();
 
 	Free(t, Arr2, n);
